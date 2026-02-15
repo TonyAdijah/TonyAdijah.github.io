@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maya Chen — Creative Developer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-elevated: #12121a;
+      --fg: #f5f5f7;
+      --muted: #6b6b7b;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.15);
+      --card: #16161f;
+      --border: #2a2a35;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* Noise texture overlay */
+    .noise-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Floating shapes */
+    .floating-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .shape-1 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent);
+      top: -100px;
+      right: -100px;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 300px;
+      height: 300px;
+      background: #ff6b35;
+      bottom: 20%;
+      left: -150px;
+      animation-delay: -7s;
+    }
+
+    .shape-3 {
+      width: 250px;
+      height: 250px;
+      background: #7b61ff;
+      top: 50%;
+      right: 10%;
+      animation-delay: -14s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(20px, 10px) scale(1.02); }
+    }
+
+    /* Reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+      .floating-shape {
+        animation: none;
+      }
+      .marquee-track {
+        animation: none;
+      }
+    }
+
+    /* Marquee */
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+    }
+
+    .marquee-track {
+      display: inline-flex;
+      animation: marquee 30s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .marquee-item {
+      padding: 1.5rem 3rem;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .marquee-item::after {
+      content: '//';
+      margin-left: 3rem;
+      color: var(--accent);
+    }
+
+    /* Project cards */
+    .project-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+    }
+
+    .project-card img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .project-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .project-card:hover .project-overlay {
+      opacity: 1;
+    }
+
+    /* Button styles */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.2);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover::before {
+      transform: translateX(0);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(200, 255, 0, 0.3);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 4px;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      background: transparent;
+      color: var(--fg);
+      font-weight: 500;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-secondary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Status indicator */
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Timeline */
+    .timeline-item {
+      position: relative;
+      padding-left: 2rem;
+      border-left: 1px solid var(--border);
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 0;
+      width: 9px;
+      height: 9px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* Form inputs */
+    .input-field {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--fg);
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-dim);
+    }
+
+    .input-field::placeholder {
+      color: var(--muted);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+
+    /* Nav link hover */
+    .nav-link {
+      position: relative;
+      color: var(--muted);
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--fg);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Social link */
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .social-link:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="noise-overlay" aria-hidden="true"></div>
+  
+  <!-- Floating background shapes -->
+  <div class="floating-shape shape-1" aria-hidden="true"></div>
+  <div class="floating-shape shape-2" aria-hidden="true"></div>
+  <div class="floating-shape shape-3" aria-hidden="true"></div>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-md bg-[rgba(10,10,15,0.8)] border-b border-[var(--border)]">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="#" class="font-display font-bold text-xl tracking-tight">MC.</a>
+      
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#work" class="nav-link text-sm font-medium">Work</a>
+        <a href="#about" class="nav-link text-sm font-medium">About</a>
+        <a href="#contact" class="nav-link text-sm font-medium">Contact</a>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="status-dot"></span>
+        <span class="text-sm text-[var(--muted)]">Available for work</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative min-h-screen flex items-center pt-20">
+    <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+      
+      <!-- Hero Content -->
+      <div class="space-y-8">
+        <div class="reveal">
+          <span class="inline-block px-4 py-2 rounded-full bg-[var(--accent-dim)] text-[var(--accent)] text-sm font-medium mb-6">
+            Creative Developer & Designer
+          </span>
+        </div>
+        
+        <h1 class="font-display font-800 text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight reveal reveal-delay-1">
+          Maya<br>
+          <span class="text-[var(--accent)]">Chen</span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-[var(--muted)] max-w-lg leading-relaxed reveal reveal-delay-2">
+          I craft digital experiences that blend cutting-edge technology with thoughtful design. 
+          Currently based in San Francisco, working with startups and brands worldwide.
+        </p>
+        
+        <div class="flex flex-wrap gap-4 reveal reveal-delay-3">
+          <a href="#work" class="btn-primary">
+            View Projects
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#contact" class="btn-secondary">Get in Touch</a>
+        </div>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="relative reveal reveal-delay-4">
+        <div class="relative aspect-[4/5] rounded-3xl overflow-hidden border border-[var(--border)]">
+          <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent-dim)] via-transparent to-[rgba(123,97,255,0.1)]"></div>
+          <img 
+            src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=750&fit=crop&crop=face" 
+            alt="Maya Chen portrait"
+            class="w-full h-full object-cover"
+            loading="eager"
+          >
+        </div>
+        
+        <!-- Floating badge -->
+        <div class="absolute -bottom-4 -left-4 md:-left-8 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="font-display font-bold text-2xl">8+</div>
+              <div class="text-sm text-[var(--muted)]">Years Experience</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Skills Marquee -->
+  <section class="marquee" aria-label="Skills">
+    <div class="marquee-track">
+      <span class="marquee-item">React</span>
+      <span class="marquee-item">TypeScript</span>
+      <span class="marquee-item">Node.js</span>
+      <span class="marquee-item">Figma</span>
+      <span class="marquee-item">Motion Design</span>
+      <span class="marquee-item">Three.js</span>
+      <span class="marquee-item">Next.js</span>
+      <span class="marquee-item">UI/UX</span>
+      <span class="marquee-item">React</span>
+      <span class="marquee-item">TypeScript</span>
+      <span class="marquee-item">Node.js</span>
+      <span class="marquee-item">Figma</span>
+      <span class="marquee-item">Motion Design</span>
+      <span class="marquee-item">Three.js</span>
+      <span class="marquee-item">Next.js</span>
+      <span class="marquee-item">UI/UX</span>
+    </div>
+  </section>
+
+  <!-- Work Section -->
+  <section id="work" class="py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-6">
+      
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+        <div>
+          <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">Selected Work</span>
+          <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">Featured Projects</h2>
+        </div>
+        <p class="text-[var(--muted)] max-w-md reveal reveal-delay-2">
+          A curated selection of projects I've brought to life through code and design.
+        </p>
+      </div>
+
+      <!-- Projects Grid -->
+      <div class="grid md:grid-cols-2 gap-8">
+        
+        <!-- Project 1 -->
+        <article class="project-card group reveal">
+          <div class="relative overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" 
+              alt="Nebula Dashboard Interface"
+              loading="lazy"
+            >
+            <div class="project-overlay flex items-end p-6">
+              <div>
+                <span class="text-[var(--accent)] text-sm font-medium">Web Application</span>
+                <h3 class="font-display font-bold text-2xl mt-1">Nebula Dashboard</h3>
+                <p class="text-[var(--muted)] mt-2 text-sm">Real-time analytics platform for SaaS companies</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">React</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">D3.js</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Node.js</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="project-card group reveal reveal-delay-1">
+          <div class="relative overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=600&fit=crop" 
+              alt="Sonora Brand Identity"
+              loading="lazy"
+            >
+            <div class="project-overlay flex items-end p-6">
+              <div>
+                <span class="text-[var(--accent)] text-sm font-medium">Brand Identity</span>
+                <h3 class="font-display font-bold text-2xl mt-1">Sonora Music</h3>
+                <p class="text-[var(--muted)] mt-2 text-sm">Complete rebrand for a music streaming startup</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Branding</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Figma</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Motion</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="project-card group reveal reveal-delay-2">
+          <div class="relative overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" 
+              alt="Velocity Mobile App"
+              loading="lazy"
+            >
+            <div class="project-overlay flex items-end p-6">
+              <div>
+                <span class="text-[var(--accent)] text-sm font-medium">Mobile App</span>
+                <h3 class="font-display font-bold text-2xl mt-1">Velocity Fitness</h3>
+                <p class="text-[var(--muted)] mt-2 text-sm">AI-powered workout tracking application</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">React Native</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Firebase</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">TensorFlow</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 4 -->
+        <article class="project-card group reveal reveal-delay-3">
+          <div class="relative overflow-hidden">
+            <img 
+              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop" 
+              alt="Prism 3D Experience"
+              loading="lazy"
+            >
+            <div class="project-overlay flex items-end p-6">
+              <div>
+                <span class="text-[var(--accent)] text-sm font-medium">Interactive Experience</span>
+                <h3 class="font-display font-bold text-2xl mt-1">Prism Gallery</h3>
+                <p class="text-[var(--muted)] mt-2 text-sm">Immersive 3D art exhibition platform</p>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Three.js</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">WebGL</span>
+              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">GSAP</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-24 md:py-32 bg-[var(--bg-elevated)]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        
+        <!-- About Content -->
+        <div class="space-y-8">
+          <div>
+            <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">About Me</span>
+            <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">
+              Building digital<br>products with purpose
+            </h2>
+          </div>
+          
+          <div class="space-y-6 text-[var(--muted)] text-lg reveal reveal-delay-2">
+            <p>
+              I'm a multidisciplinary creative developer with 8+ years of experience crafting digital products 
+              that people actually want to use. My approach combines technical excellence with design thinking 
+              to create experiences that feel both intuitive and delightful.
+            </p>
+            <p>
+              When I'm not pushing pixels or writing code, you'll find me exploring hiking trails around 
+              the Bay Area, experimenting with generative art, or mentoring the next generation of designers 
+              through ADPList.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-4 reveal reveal-delay-3">
+            <div class="flex items-center gap-3 px-4 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span class="text-sm font-medium">San Francisco, CA</span>
+            </div>
+            <div class="flex items-center gap-3 px-4 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)]">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <span class="text-sm font-medium">Open to freelance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience Timeline -->
+        <div class="space-y-8">
+          <h3 class="font-display font-bold text-xl reveal reveal-delay-1">Experience</h3>
+          
+          <div class="space-y-8">
+            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-2">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <h4 class="font-display font-bold text-lg">Senior Creative Developer</h4>
+                  <p class="text-[var(--accent)]">Vercel</p>
+                </div>
+                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2022 — Present</span>
+              </div>
+              <p class="text-[var(--muted)] mt-3 text-sm">
+                Leading creative engineering initiatives and building interactive marketing experiences.
+              </p>
+            </div>
+
+            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-3">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <h4 class="font-display font-bold text-lg">Design Technologist</h4>
+                  <p class="text-[var(--accent)]">Figma</p>
+                </div>
+                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2019 — 2022</span>
+              </div>
+              <p class="text-[var(--muted)] mt-3 text-sm">
+                Prototyping future product concepts and building internal design tools.
+              </p>
+            </div>
+
+            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-4">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <h4 class="font-display font-bold text-lg">Frontend Developer</h4>
+                  <p class="text-[var(--accent)]">Stripe</p>
+                </div>
+                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2017 — 2019</span>
+              </div>
+              <p class="text-[var(--muted)] mt-3 text-sm">
+                Built and maintained payment interfaces used by millions of businesses.
+              </p>
+            </div>
+
+            <div class="timeline-item pl-8 reveal reveal-delay-4">
+              <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <h4 class="font-display font-bold text-lg">Junior Developer</h4>
+                  <p class="text-[var(--accent)]">IDEO</p>
+                </div>
+                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2015 — 2017</span>
+              </div>
+              <p class="text-[var(--muted)] mt-3 text-sm">
+                Contributed to human-centered design projects across healthcare and education.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-24 md:py-32 relative">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16">
+        
+        <!-- Contact Info -->
+        <div class="space-y-8">
+          <div>
+            <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">Get in Touch</span>
+            <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">
+              Let's create<br>something together
+            </h2>
+          </div>
+          
+          <p class="text-lg text-[var(--muted)] max-w-md reveal reveal-delay-2">
+            Have a project in mind or just want to chat? I'm always open to discussing new opportunities, 
+            creative ideas, or ways to bring your vision to life.
+          </p>
+
+          <div class="space-y-4 reveal reveal-delay-3">
+            <a href="mailto:maya@example.com" class="flex items-center gap-4 group">
+              <div class="w-12 h-12 rounded-xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center group-hover:border-[var(--accent)] transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <div>
+                <div class="text-sm text-[var(--muted)]">Email</div>
+                <div class="font-medium group-hover:text-[var(--accent)] transition-colors">maya@example.com</div>
+              </div>
+            </a>
+          </div>
+
+          <!-- Social Links -->
+          <div class="flex gap-3 reveal reveal-delay-4">
+            <a href="#" class="social-link" aria-label="GitHub Profile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter Profile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn Profile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="Dribbble Profile">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.816zm-11.62-2.58c.232-.4 3.045-5.055 8.332-6.765.135-.045.27-.084.405-.12-.26-.585-.54-1.167-.832-1.74C7.17 11.775 2.206 11.71 1.756 11.7l-.004.312c0 2.633.998 5.037 2.634 6.855zm-2.42-8.955c.46.008 4.683.026 9.477-1.248-1.698-3.018-3.53-5.558-3.8-5.928-2.868 1.35-5.01 3.99-5.676 7.17zM9.6 2.052c.282.38 2.145 2.914 3.822 6 3.645-1.365 5.19-3.44 5.373-3.702-1.81-1.61-4.19-2.586-6.795-2.586-.825 0-1.63.1-2.4.285zm10.335 3.483c-.218.29-1.935 2.493-5.724 4.04.24.49.47.985.68 1.486.08.18.15.36.22.53 3.41-.43 6.8.26 7.14.33-.02-2.42-.88-4.64-2.31-6.38z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <form class="space-y-6 reveal reveal-delay-2" onsubmit="handleSubmit(event)">
+          <div class="grid sm:grid-cols-2 gap-6">
+            <div>
+              <label for="name" class="block text-sm font-medium mb-2">Name</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name"
+                class="input-field" 
+                placeholder="John Doe"
+                required
+              >
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium mb-2">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                class="input-field" 
+                placeholder="john@example.com"
+                required
+              >
+            </div>
+          </div>
+          
+          <div>
+            <label for="subject" class="block text-sm font-medium mb-2">Subject</label>
+            <input 
+              type="text" 
+              id="subject" 
+              name="subject"
+              class="input-field" 
+              placeholder="Project inquiry"
+            >
+          </div>
+          
+          <div>
+            <label for="message" class="block text-sm font-medium mb-2">Message</label>
+            <textarea 
+              id="message" 
+              name="message"
+              rows="5" 
+              class="input-field resize-none" 
+              placeholder="Tell me about your project..."
+              required
+            ></textarea>
+          </div>
+          
+          <button type="submit" class="btn-primary w-full justify-center">
+            Send Message
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 border-t border-[var(--border)]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 text-[var(--muted)] text-sm">
+          <span>Designed & Built by</span>
+          <span class="font-display font-bold text-[var(--fg)]">Maya Chen</span>
+        </div>
+        <div class="text-sm text-[var(--muted)]">
+          &copy; 2024 All rights reserved.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Scroll reveal animation
+      const revealElements = document.querySelectorAll('.reveal');
+      
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      };
+
+      const revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      revealElements.forEach(function(el) {
+        revealObserver.observe(el);
+      });
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const target = document.querySelector(targetId);
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+    });
+
+    // Form submission handler
+    function handleSubmit(e) {
+      e.preventDefault();
+      const button = e.target.querySelector('button[type="submit"]');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = '<span>Sending...</span>';
+      button.disabled = true;
+      
+      // Simulate form submission
+      setTimeout(function() {
+        button.innerHTML = '<span>Message Sent!</span>';
+        button.style.background = '#22c55e';
+        
+        setTimeout(function() {
+          button.innerHTML = originalText;
+          button.style.background = '';
+          button.disabled = false;
+          e.target.reset();
+        }, 2000);
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
