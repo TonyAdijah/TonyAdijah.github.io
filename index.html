@@ -3,727 +3,625 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maya Chen — Creative Developer</title>
+  <title>Tony Adijah — GTM Engineer & Marketing Head</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --bg-elevated: #12121a;
-      --fg: #f5f5f7;
+      --bg: #050505;
+      --bg-elevated: #0a0a0a;
+      --fg: #ffffff;
       --muted: #6b6b7b;
-      --accent: #c8ff00;
-      --accent-dim: rgba(200, 255, 0, 0.15);
-      --card: #16161f;
-      --border: #2a2a35;
+      --accent: #00ff88;
+      --accent-secondary: #ff006e;
+      --accent-tertiary: #00d4ff;
+      --card: #111111;
+      --border: #222222;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; overflow-x: hidden; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    .font-display {
-      font-family: 'Syne', sans-serif;
-    }
-
-    /* Noise texture overlay */
-    .noise-overlay {
+    /* ===== CUSTOM CURSOR ===== */
+    .cursor-dot {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    }
-
-    /* Floating shapes */
-    .floating-shape {
-      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.4;
-      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, opacity 0.3s ease;
+      box-shadow: 0 0 10px var(--accent), 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+    .cursor-dot.cursor-hover {
+      width: 16px;
+      height: 16px;
+      background: var(--accent-secondary);
+      box-shadow: 0 0 15px var(--accent-secondary), 0 0 30px rgba(255, 0, 110, 0.3);
+    }
+    .cursor-dot.cursor-text {
+      width: 4px;
+      height: 30px;
+      border-radius: 2px;
+      background: var(--accent-tertiary);
+      box-shadow: 0 0 10px var(--accent-tertiary);
+    }
+    .cursor-dot.cursor-hidden {
+      opacity: 0;
+      width: 0;
+      height: 0;
     }
 
-    .shape-1 {
+    .cursor-ring {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(0, 255, 136, 0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, border-width 0.3s ease, opacity 0.3s ease, background 0.3s ease;
+    }
+    .cursor-ring.cursor-hover {
+      width: 60px;
+      height: 60px;
+      border-color: rgba(255, 0, 110, 0.4);
+      border-width: 2px;
+      background: rgba(255, 0, 110, 0.05);
+    }
+    .cursor-ring.cursor-text {
+      width: 2px;
+      height: 36px;
+      border-radius: 2px;
+      border-color: transparent;
+      background: rgba(0, 212, 255, 0.1);
+    }
+    .cursor-ring.cursor-hidden {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cursor-trail {
+      position: fixed;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99997;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+    }
+
+    .cursor-glow {
+      position: fixed;
       width: 400px;
       height: 400px;
-      background: var(--accent);
-      top: -100px;
-      right: -100px;
-      animation-delay: 0s;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      mix-blend-mode: screen;
     }
 
-    .shape-2 {
-      width: 300px;
-      height: 300px;
-      background: #ff6b35;
-      bottom: 20%;
-      left: -150px;
-      animation-delay: -7s;
+    .magnetic-target {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .shape-3 {
-      width: 250px;
-      height: 250px;
-      background: #7b61ff;
-      top: 50%;
-      right: 10%;
-      animation-delay: -14s;
-    }
+    .gradient-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .gradient-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: orbFloat 15s ease-in-out infinite; }
+    .orb-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; right: -200px; animation-delay: 0s; }
+    .orb-2 { width: 500px; height: 500px; background: var(--accent-secondary); bottom: -150px; left: -150px; animation-delay: -5s; }
+    .orb-3 { width: 400px; height: 400px; background: var(--accent-tertiary); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
 
-    @keyframes float {
+    @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -30px) scale(1.05); }
-      50% { transform: translate(-20px, 20px) scale(0.95); }
-      75% { transform: translate(20px, 10px) scale(1.02); }
+      25% { transform: translate(50px, -50px) scale(1.1); }
+      50% { transform: translate(-30px, 30px) scale(0.9); }
+      75% { transform: translate(40px, 20px) scale(1.05); }
     }
 
-    /* Reveal animations */
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .grid-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%); }
 
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
+    .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
     .reveal-delay-4 { transition-delay: 0.4s; }
 
     @media (prefers-reduced-motion: reduce) {
-      .reveal {
-        opacity: 1;
-        transform: none;
-        transition: none;
-      }
-      .floating-shape {
-        animation: none;
-      }
-      .marquee-track {
-        animation: none;
-      }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .gradient-orb, .marquee-track, .text-shimmer, .text-shimmer-secondary, .tech-marquee { animation: none !important; }
+      .cursor-dot, .cursor-ring, .cursor-glow, .cursor-trail { display: none !important; }
+      * { cursor: auto !important; }
     }
 
-    /* Marquee */
-    .marquee {
-      overflow: hidden;
-      white-space: nowrap;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-elevated);
+    @media (hover: none) and (pointer: coarse) {
+      .cursor-dot, .cursor-ring, .cursor-glow, .cursor-trail { display: none !important; }
+      * { cursor: auto !important; }
     }
 
-    .marquee-track {
-      display: inline-flex;
-      animation: marquee 30s linear infinite;
+    .text-glow { text-shadow: 0 0 40px rgba(0, 255, 136, 0.5); }
+
+    .text-shimmer {
+      background: linear-gradient(90deg, var(--fg) 0%, var(--accent) 25%, var(--accent-tertiary) 50%, var(--accent) 75%, var(--fg) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
     }
 
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+    .text-shimmer-secondary {
+      background: linear-gradient(90deg, var(--fg) 0%, var(--accent-tertiary) 25%, var(--accent-secondary) 50%, var(--accent-tertiary) 75%, var(--fg) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 5s linear infinite;
+      animation-delay: -1.5s;
     }
 
-    .marquee-item {
-      padding: 1.5rem 3rem;
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
+    @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
-    .marquee-item::after {
-      content: '//';
-      margin-left: 3rem;
-      color: var(--accent);
-    }
+    .nav-glass { background: rgba(5, 5, 5, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .nav-link { position: relative; color: var(--muted); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 0; transition: color 0.3s ease; }
+    .nav-link::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-tertiary)); transform: scaleX(0); transform-origin: right; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .nav-link:hover { color: var(--fg); }
+    .nav-link:hover::before { transform: scaleX(1); transform-origin: left; }
 
-    /* Project cards */
-    .project-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                  border-color 0.3s ease;
-    }
+    .status-badge { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 100px; font-size: 0.75rem; font-weight: 500; color: var(--accent); }
+    .status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: statusPulse 2s ease-in-out infinite; box-shadow: 0 0 10px var(--accent); }
+    @keyframes statusPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
 
-    .project-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--accent);
-    }
+    .hero-title { font-size: clamp(3.5rem, 12vw, 10rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; }
+    .hero-image-container { position: relative; display: flex; justify-content: center; align-items: center; }
+    .hero-image { width: 100%; max-width: 500px; height: auto; object-fit: contain; filter: grayscale(100%); transition: filter 0.5s ease, transform 0.5s ease; }
+    .hero-image:hover { filter: grayscale(0%); transform: scale(1.02); }
 
-    .project-card img {
-      width: 100%;
-      height: 280px;
-      object-fit: cover;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    .btn-primary { position: relative; display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: var(--accent); color: var(--bg); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9375rem; border-radius: 100px; border: none; cursor: none; overflow: hidden; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease; }
+    .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transform: translateX(-100%); transition: transform 0.5s ease; }
+    .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 40px rgba(0, 255, 136, 0.4); }
+    .btn-primary:hover::before { transform: translateX(100%); }
+    .btn-primary:active { transform: translateY(0) scale(0.98); }
+    .btn-primary:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
 
-    .project-card:hover img {
-      transform: scale(1.05);
-    }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 1.75rem; background: transparent; color: var(--fg); font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 0.9375rem; border-radius: 100px; border: 1px solid var(--border); cursor: none; transition: all 0.3s ease; }
+    .btn-secondary:hover { border-color: var(--accent); background: rgba(0, 255, 136, 0.05); box-shadow: 0 0 20px rgba(0, 255, 136, 0.1); }
 
-    .project-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(10,10,15,0.95) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
+    .section-label { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 100px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+    .section-label::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: statusPulse 2s ease-in-out infinite; }
 
-    .project-card:hover .project-overlay {
-      opacity: 1;
-    }
+    .service-card, .case-card, .result-card { position: relative; background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .service-card::before, .case-card::before, .result-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, transparent 50%, rgba(255, 0, 110, 0.1) 100%); opacity: 0; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+    .service-card:hover, .case-card:hover, .result-card:hover { transform: translateY(-10px) scale(1.02); border-color: rgba(0, 255, 136, 0.3); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 60px -15px rgba(0, 255, 136, 0.3); }
+    .service-card:hover::before, .case-card:hover::before, .result-card:hover::before { opacity: 1; }
 
-    /* Button styles */
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 1rem 2rem;
-      background: var(--accent);
-      color: var(--bg);
-      font-weight: 600;
-      border-radius: 100px;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                  box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
+    .cert-card { position: relative; background: var(--card); border-radius: 24px; overflow: hidden; border: 1px solid var(--border); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .cert-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, transparent 40%, rgba(0, 212, 255, 0.15) 100%); opacity: 0; transition: opacity 0.5s ease; z-index: 1; pointer-events: none; }
+    .cert-card:hover { transform: translateY(-8px) scale(1.01); border-color: rgba(0, 255, 136, 0.4); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 80px -15px rgba(0, 255, 136, 0.3); }
+    .cert-card:hover::before { opacity: 1; }
+    .cert-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0, 255, 136, 0.08) 0%, transparent 50%); animation: certGlow 6s ease-in-out infinite; pointer-events: none; }
+    @keyframes certGlow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 20px); } }
+    .cert-image { width: 100%; height: auto; border-radius: 16px; transition: transform 0.5s ease, filter 0.5s ease; }
+    .cert-image:hover { transform: scale(1.02); }
 
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.2);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-    }
+    .tech-marquee-container { overflow: hidden; white-space: nowrap; padding: 2rem 0; }
+    .tech-marquee { display: inline-flex; animation: marquee 30s linear infinite; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .tech-item { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 2rem; margin: 0 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 100px; font-size: 0.9rem; font-weight: 500; color: var(--fg); transition: all 0.3s ease; }
+    .tech-item:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
-    .btn-primary:hover::before {
-      transform: translateX(0);
-    }
+    .input-field { width: 100%; padding: 1rem 1.25rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; color: var(--fg); font-family: inherit; font-size: 1rem; transition: all 0.3s ease; cursor: none; }
+    .input-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.1), 0 0 20px rgba(0, 255, 136, 0.1); }
+    .input-field::placeholder { color: var(--muted); }
 
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 40px rgba(200, 255, 0, 0.3);
-    }
+    .timeline-item { position: relative; padding-left: 2rem; padding-bottom: 2.5rem; border-left: 2px solid var(--border); transition: border-color 0.3s ease; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-item::before { content: ''; position: absolute; left: -8px; top: 0; width: 14px; height: 14px; background: var(--bg); border: 3px solid var(--accent); border-radius: 50%; transition: all 0.3s ease; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+    .timeline-item:hover { border-left-color: var(--accent); }
+    .timeline-item:hover::before { background: var(--accent); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
 
-    .btn-primary:focus-visible {
-      outline: 2px solid var(--fg);
-      outline-offset: 4px;
-    }
+    .social-icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); transition: all 0.3s ease; }
+    .social-icon:hover { border-color: var(--accent); background: rgba(0, 255, 136, 0.1); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2); }
+    .social-icon:hover svg { stroke: var(--accent); }
 
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.875rem 1.5rem;
-      background: transparent;
-      color: var(--fg);
-      font-weight: 500;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-secondary:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    /* Status indicator */
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
-    }
-
-    /* Timeline */
-    .timeline-item {
-      position: relative;
-      padding-left: 2rem;
-      border-left: 1px solid var(--border);
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -5px;
-      top: 0;
-      width: 9px;
-      height: 9px;
-      background: var(--accent);
-      border-radius: 50%;
-    }
-
-    /* Form inputs */
-    .input-field {
-      width: 100%;
-      padding: 1rem 1.25rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--fg);
-      font-size: 1rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .input-field:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px var(--accent-dim);
-    }
-
-    .input-field::placeholder {
-      color: var(--muted);
-    }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--muted);
-    }
-
-    /* Nav link hover */
-    .nav-link {
-      position: relative;
-      color: var(--muted);
-      transition: color 0.3s ease;
-    }
-
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--accent);
-      transition: width 0.3s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--fg);
-    }
-
-    .nav-link:hover::after {
-      width: 100%;
-    }
-
-    /* Social link */
-    .social-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--muted);
-      transition: all 0.3s ease;
-    }
-
-    .social-link:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateY(-4px);
-    }
-
-    .social-link:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+    section[id] { scroll-margin-top: 120px; }
   </style>
 </head>
 <body>
-  <div class="noise-overlay" aria-hidden="true"></div>
-  
-  <!-- Floating background shapes -->
-  <div class="floating-shape shape-1" aria-hidden="true"></div>
-  <div class="floating-shape shape-2" aria-hidden="true"></div>
-  <div class="floating-shape shape-3" aria-hidden="true"></div>
+  <!-- Custom Cursor Elements -->
+  <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-1" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-2" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-3" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-4" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-5" aria-hidden="true"></div>
+
+  <div class="gradient-bg" aria-hidden="true">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+  </div>
+  <div class="grid-pattern" aria-hidden="true"></div>
 
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-md bg-[rgba(10,10,15,0.8)] border-b border-[var(--border)]">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <a href="#" class="font-display font-bold text-xl tracking-tight">MC.</a>
-      
-      <div class="hidden md:flex items-center gap-8">
-        <a href="#work" class="nav-link text-sm font-medium">Work</a>
-        <a href="#about" class="nav-link text-sm font-medium">About</a>
-        <a href="#contact" class="nav-link text-sm font-medium">Contact</a>
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-glass">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="#" class="font-display text-2xl font-bold tracking-tight magnetic-target">
+        <span class="text-glow" style="color: var(--accent);">T</span><span class="text-[var(--muted)]">.</span>
+      </a>
+      <div class="hidden md:flex items-center gap-10">
+        <a href="#services" class="nav-link magnetic-target">Services</a>
+        <a href="#results" class="nav-link magnetic-target">Results</a>
+        <a href="#case-studies" class="nav-link magnetic-target">Case Studies</a>
+        <a href="#certification" class="nav-link magnetic-target">Certification</a>
+        <a href="#about" class="nav-link magnetic-target">About</a>
+        <a href="#contact" class="nav-link magnetic-target">Contact</a>
       </div>
-
-      <div class="flex items-center gap-3">
-        <span class="status-dot"></span>
-        <span class="text-sm text-[var(--muted)]">Available for work</span>
+      <div class="flex items-center gap-4">
+        <a href="https://www.linkedin.com/in/tony-adijah-965903131/" target="_blank" rel="noopener noreferrer" class="social-icon magnetic-target" aria-label="LinkedIn Profile">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+        </a>
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Available for Hire</span>
+        </div>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <header class="relative min-h-screen flex items-center pt-20">
-    <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
-      
-      <!-- Hero Content -->
-      <div class="space-y-8">
-        <div class="reveal">
-          <span class="inline-block px-4 py-2 rounded-full bg-[var(--accent-dim)] text-[var(--accent)] text-sm font-medium mb-6">
-            Creative Developer & Designer
-          </span>
-        </div>
-        
-        <h1 class="font-display font-800 text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight reveal reveal-delay-1">
-          Maya<br>
-          <span class="text-[var(--accent)]">Chen</span>
-        </h1>
-        
-        <p class="text-lg md:text-xl text-[var(--muted)] max-w-lg leading-relaxed reveal reveal-delay-2">
-          I craft digital experiences that blend cutting-edge technology with thoughtful design. 
-          Currently based in San Francisco, working with startups and brands worldwide.
-        </p>
-        
-        <div class="flex flex-wrap gap-4 reveal reveal-delay-3">
-          <a href="#work" class="btn-primary">
-            View Projects
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
-          <a href="#contact" class="btn-secondary">Get in Touch</a>
-        </div>
-      </div>
-
-      <!-- Hero Image -->
-      <div class="relative reveal reveal-delay-4">
-        <div class="relative aspect-[4/5] rounded-3xl overflow-hidden border border-[var(--border)]">
-          <div class="absolute inset-0 bg-gradient-to-br from-[var(--accent-dim)] via-transparent to-[rgba(123,97,255,0.1)]"></div>
-          <img 
-            src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&h=750&fit=crop&crop=face" 
-            alt="Maya Chen portrait"
-            class="w-full h-full object-cover"
-            loading="eager"
-          >
-        </div>
-        
-        <!-- Floating badge -->
-        <div class="absolute -bottom-4 -left-4 md:-left-8 bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-2xl">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-[var(--accent)] flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
+  <!-- Hero -->
+  <header class="relative z-10 min-h-screen flex items-center pt-24 pb-16">
+    <div class="max-w-7xl mx-auto px-6 w-full">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div class="space-y-8">
+          <div class="reveal">
+            <span class="section-label">GTM Engineer & Marketing Head</span>
+          </div>
+          <h1 class="font-display hero-title reveal reveal-delay-1">
+            <span class="text-shimmer">TONY</span><br>
+            <span class="text-shimmer-secondary">ADIJAH</span>
+          </h1>
+          <p class="text-xl text-[var(--muted)] max-w-lg leading-relaxed reveal reveal-delay-2">
+            I build high-ROI <span style="color: var(--accent);">outbound systems</span> and <span style="color: var(--accent-secondary);">automation</span> for B2B SaaS companies. Pipeline growth, simplified.
+          </p>
+          <div class="flex flex-wrap gap-4 reveal reveal-delay-3">
+            <a href="#contact" class="btn-primary magnetic-target">
+              Work with Me
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#case-studies" class="btn-secondary magnetic-target">View Case Studies</a>
+          </div>
+          <div class="flex gap-12 pt-8 reveal reveal-delay-4">
+            <div>
+              <div class="font-display text-4xl font-bold text-glow" style="color: var(--accent);">~25%</div>
+              <div class="text-sm text-[var(--muted)] mt-1">Lead Growth</div>
             </div>
             <div>
-              <div class="font-display font-bold text-2xl">8+</div>
-              <div class="text-sm text-[var(--muted)]">Years Experience</div>
+              <div class="font-display text-4xl font-bold" style="color: var(--accent-secondary);">2+</div>
+              <div class="text-sm text-[var(--muted)] mt-1">Years Exp</div>
             </div>
+            <div>
+              <div class="font-display text-4xl font-bold" style="color: var(--accent-tertiary);">10+</div>
+              <div class="text-sm text-[var(--muted)] mt-1">Hrs Saved/Wk</div>
+            </div>
+          </div>
+        </div>
+        <div class="relative reveal reveal-delay-2">
+          <div class="hero-image-container">
+            <img src="tony.png" alt="Tony Adijah" class="hero-image" loading="eager">
           </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Skills Marquee -->
-  <section class="marquee" aria-label="Skills">
-    <div class="marquee-track">
-      <span class="marquee-item">React</span>
-      <span class="marquee-item">TypeScript</span>
-      <span class="marquee-item">Node.js</span>
-      <span class="marquee-item">Figma</span>
-      <span class="marquee-item">Motion Design</span>
-      <span class="marquee-item">Three.js</span>
-      <span class="marquee-item">Next.js</span>
-      <span class="marquee-item">UI/UX</span>
-      <span class="marquee-item">React</span>
-      <span class="marquee-item">TypeScript</span>
-      <span class="marquee-item">Node.js</span>
-      <span class="marquee-item">Figma</span>
-      <span class="marquee-item">Motion Design</span>
-      <span class="marquee-item">Three.js</span>
-      <span class="marquee-item">Next.js</span>
-      <span class="marquee-item">UI/UX</span>
-    </div>
-  </section>
-
-  <!-- Work Section -->
-  <section id="work" class="py-24 md:py-32">
+  <!-- Services -->
+  <section id="services" class="relative z-10 py-32 bg-[var(--bg-elevated)]">
     <div class="max-w-7xl mx-auto px-6">
-      
-      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
-        <div>
-          <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">Selected Work</span>
-          <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">Featured Projects</h2>
-        </div>
-        <p class="text-[var(--muted)] max-w-md reveal reveal-delay-2">
-          A curated selection of projects I've brought to life through code and design.
+      <div class="text-center mb-16">
+        <span class="section-label reveal">What I Do</span>
+        <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 reveal reveal-delay-1">
+          Services & <span class="text-[var(--muted)]">Expertise</span>
+        </h2>
+        <p class="text-[var(--muted)] max-w-2xl mx-auto mt-4 reveal reveal-delay-2">
+          Results-driven strategies to scale your outbound and automate your revenue engine.
         </p>
       </div>
-
-      <!-- Projects Grid -->
       <div class="grid md:grid-cols-2 gap-8">
-        
-        <!-- Project 1 -->
-        <article class="project-card group reveal">
-          <div class="relative overflow-hidden">
-            <img 
-              src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop" 
-              alt="Nebula Dashboard Interface"
-              loading="lazy"
-            >
-            <div class="project-overlay flex items-end p-6">
-              <div>
-                <span class="text-[var(--accent)] text-sm font-medium">Web Application</span>
-                <h3 class="font-display font-bold text-2xl mt-1">Nebula Dashboard</h3>
-                <p class="text-[var(--muted)] mt-2 text-sm">Real-time analytics platform for SaaS companies</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">React</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">D3.js</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Node.js</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project 2 -->
-        <article class="project-card group reveal reveal-delay-1">
-          <div class="relative overflow-hidden">
-            <img 
-              src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=600&fit=crop" 
-              alt="Sonora Brand Identity"
-              loading="lazy"
-            >
-            <div class="project-overlay flex items-end p-6">
-              <div>
-                <span class="text-[var(--accent)] text-sm font-medium">Brand Identity</span>
-                <h3 class="font-display font-bold text-2xl mt-1">Sonora Music</h3>
-                <p class="text-[var(--muted)] mt-2 text-sm">Complete rebrand for a music streaming startup</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Branding</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Figma</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Motion</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project 3 -->
-        <article class="project-card group reveal reveal-delay-2">
-          <div class="relative overflow-hidden">
-            <img 
-              src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop" 
-              alt="Velocity Mobile App"
-              loading="lazy"
-            >
-            <div class="project-overlay flex items-end p-6">
-              <div>
-                <span class="text-[var(--accent)] text-sm font-medium">Mobile App</span>
-                <h3 class="font-display font-bold text-2xl mt-1">Velocity Fitness</h3>
-                <p class="text-[var(--muted)] mt-2 text-sm">AI-powered workout tracking application</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">React Native</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Firebase</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">TensorFlow</span>
-            </div>
-          </div>
-        </article>
-
-        <!-- Project 4 -->
-        <article class="project-card group reveal reveal-delay-3">
-          <div class="relative overflow-hidden">
-            <img 
-              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=600&fit=crop" 
-              alt="Prism 3D Experience"
-              loading="lazy"
-            >
-            <div class="project-overlay flex items-end p-6">
-              <div>
-                <span class="text-[var(--accent)] text-sm font-medium">Interactive Experience</span>
-                <h3 class="font-display font-bold text-2xl mt-1">Prism Gallery</h3>
-                <p class="text-[var(--muted)] mt-2 text-sm">Immersive 3D art exhibition platform</p>
-              </div>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">Three.js</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">WebGL</span>
-              <span class="px-3 py-1 text-xs font-medium bg-[var(--accent-dim)] text-[var(--accent)] rounded-full">GSAP</span>
-            </div>
-          </div>
-        </article>
-
+        <article class="service-card reveal"><div class="relative z-10 p-8">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-tertiary)] flex items-center justify-center mb-6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg></div>
+          <h3 class="font-display text-2xl font-bold">Outbound Strategy & Campaigns</h3>
+          <p class="text-[var(--muted)] mt-3">Design and execute targeted email and LinkedIn outreach to fill your sales pipeline. Data-driven campaigns that improve response rates and book meetings.</p>
+        </div></article>
+        <article class="service-card reveal reveal-delay-1"><div class="relative z-10 p-8">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-secondary)] to-[var(--accent)] flex items-center justify-center mb-6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <h3 class="font-display text-2xl font-bold">Lead Sourcing & CRM Integration</h3>
+          <p class="text-[var(--muted)] mt-3">Build and clean high-quality lead lists using Clay, Apollo, and Sales Navigator. Seamless CRM integration ensures you're always engaging the right prospects.</p>
+        </div></article>
+        <article class="service-card reveal reveal-delay-2"><div class="relative z-10 p-8">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent-tertiary)] to-[var(--accent-secondary)] flex items-center justify-center mb-6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+          <h3 class="font-display text-2xl font-bold">Automation & Workflows</h3>
+          <p class="text-[var(--muted)] mt-3">Create no-code workflows with n8n and Zapier that automate follow-ups and lead nurturing. Streamline outreach, reduce manual work, and boost engagement.</p>
+        </div></article>
+        <article class="service-card reveal reveal-delay-3"><div class="relative z-10 p-8">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-secondary)] flex items-center justify-center mb-6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div>
+          <h3 class="font-display text-2xl font-bold">GTM Operations & Consulting</h3>
+          <p class="text-[var(--muted)] mt-3">Align marketing, sales, and product teams on strategy and execution. Develop dashboards and processes that make pipeline growth predictable.</p>
+        </div></article>
       </div>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section id="about" class="py-24 md:py-32 bg-[var(--bg-elevated)]">
+  <!-- Real Results -->
+  <section id="results" class="relative z-10 py-32">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="grid lg:grid-cols-2 gap-16 items-start">
-        
-        <!-- About Content -->
+      <div class="text-center mb-16">
+        <span class="section-label reveal">Real Results</span>
+        <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 reveal reveal-delay-1">
+          Impact in <span class="text-[var(--muted)]">Numbers</span>
+        </h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <article class="result-card reveal text-center p-8">
+          <div class="relative z-10">
+            <div class="font-display text-5xl font-bold text-glow mb-2" style="color: var(--accent);">~25%</div>
+            <h3 class="font-display text-xl font-bold">Lead Quality Improvement</h3>
+            <p class="text-[var(--muted)] mt-2 text-sm">Better targeting & personalization</p>
+          </div>
+        </article>
+        <article class="result-card reveal reveal-delay-1 text-center p-8">
+          <div class="relative z-10">
+            <div class="font-display text-5xl font-bold mb-2" style="color: var(--accent-secondary);">2x</div>
+            <h3 class="font-display text-xl font-bold">Reply Rate Boost</h3>
+            <p class="text-[var(--muted)] mt-2 text-sm">Optimized email sequences</p>
+          </div>
+        </article>
+        <article class="result-card reveal reveal-delay-2 text-center p-8">
+          <div class="relative z-10">
+            <div class="font-display text-5xl font-bold mb-2" style="color: var(--accent-tertiary);">10+</div>
+            <h3 class="font-display text-xl font-bold">Hours Saved Weekly</h3>
+            <p class="text-[var(--muted)] mt-2 text-sm">Via automation workflows</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="relative z-10 py-16 bg-[var(--bg-elevated)] border-t border-b border-[var(--border)]" aria-label="Tech Stack">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-8">
+        <span class="section-label reveal">Tools I Use</span>
+        <h2 class="font-display text-3xl md:text-4xl font-bold mt-4 reveal reveal-delay-1">
+          Tech <span class="text-[var(--muted)]">Stack</span>
+        </h2>
+      </div>
+    </div>
+    <div class="tech-marquee-container">
+      <div class="tech-marquee">
+        <span class="tech-item">Clay (Certified)</span>
+        <span class="tech-item">n8n</span>
+        <span class="tech-item">Zapier</span>
+        <span class="tech-item">Instantly.ai</span>
+        <span class="tech-item">Lemlist</span>
+        <span class="tech-item">Smartlead</span>
+        <span class="tech-item">Apollo</span>
+        <span class="tech-item">Sales Navigator</span>
+        <span class="tech-item">HubSpot CRM</span>
+        <span class="tech-item">Slack</span>
+        <span class="tech-item">Clay (Certified)</span>
+        <span class="tech-item">n8n</span>
+        <span class="tech-item">Zapier</span>
+        <span class="tech-item">Instantly.ai</span>
+        <span class="tech-item">Lemlist</span>
+        <span class="tech-item">Smartlead</span>
+        <span class="tech-item">Apollo</span>
+        <span class="tech-item">Sales Navigator</span>
+        <span class="tech-item">HubSpot CRM</span>
+        <span class="tech-item">Slack</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Case Studies -->
+  <section id="case-studies" class="relative z-10 py-32 bg-[var(--bg-elevated)]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="section-label reveal">Case Studies</span>
+        <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 reveal reveal-delay-1">
+          Workflow <span class="text-[var(--muted)]">Showcase</span>
+        </h2>
+        <p class="text-[var(--muted)] max-w-2xl mx-auto mt-4 reveal reveal-delay-2">
+          Real-world automation and GTM systems I've built using Clay and n8n.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <article class="case-card reveal">
+          <div class="relative z-10 p-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent-secondary)] to-[var(--accent)] flex items-center justify-center mb-6">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <div class="text-[var(--accent-secondary)] font-bold text-sm uppercase tracking-wider mb-3">n8n Workflows</div>
+            <h3 class="font-display text-2xl font-bold">Automated Outreach Engine</h3>
+            <p class="text-[var(--muted)] mt-3">Built custom n8n workflows to automate lead enrichment, multi-step follow-ups, and real-time notifications for sales teams. Eliminated manual touchpoints across the entire outreach pipeline.</p>
+            <div class="mt-6 pt-6 border-t border-[var(--border)]">
+              <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(255,0,110,0.1)] text-[var(--accent-secondary)] border border-[rgba(255,0,110,0.2)]">n8n</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(255,0,110,0.1)] text-[var(--accent-secondary)] border border-[rgba(255,0,110,0.2)]">Lead Enrichment</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(255,0,110,0.1)] text-[var(--accent-secondary)] border border-[rgba(255,0,110,0.2)]">Follow-ups</span>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="case-card reveal reveal-delay-1">
+          <div class="relative z-10 p-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent-tertiary)] to-[var(--accent)] flex items-center justify-center mb-6">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div class="text-[var(--accent-tertiary)] font-bold text-sm uppercase tracking-wider mb-3">Clay Workflows</div>
+            <h3 class="font-display text-2xl font-bold">Data Enrichment Pipeline</h3>
+            <p class="text-[var(--muted)] mt-3">Implemented Clay to build high-quality, enriched lead lists at scale. Integrated with CRM for seamless pipeline management, automated scoring, and real-time prospect intelligence.</p>
+            <div class="mt-6 pt-6 border-t border-[var(--border)]">
+              <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(0,212,255,0.1)] text-[var(--accent-tertiary)] border border-[rgba(0,212,255,0.2)]">Clay</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(0,212,255,0.1)] text-[var(--accent-tertiary)] border border-[rgba(0,212,255,0.2)]">Data Enrichment</span>
+                <span class="px-3 py-1 text-xs rounded-full bg-[rgba(0,212,255,0.1)] text-[var(--accent-tertiary)] border border-[rgba(0,212,255,0.2)]">CRM Sync</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clay Certification -->
+  <section id="certification" class="relative z-10 py-32">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <span class="section-label reveal">Certified</span>
+        <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 reveal reveal-delay-1">
+          Clay <span class="text-[var(--muted)]">Certification</span>
+        </h2>
+        <p class="text-[var(--muted)] max-w-2xl mx-auto mt-4 reveal reveal-delay-2">
+          Officially certified by Clay — validating expertise in data enrichment, workflow automation, and GTM infrastructure.
+        </p>
+      </div>
+      <div class="max-w-3xl mx-auto reveal reveal-delay-2">
+        <div class="cert-card">
+          <div class="cert-glow"></div>
+          <div class="relative z-10 p-8 md:p-12">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-full mb-8">
+                <img src="outbound-automation-certification.png" alt="Clay Certification Badge — Tony Adijah" class="cert-image" loading="lazy">
+              </div>
+              <div class="inline-flex items-center gap-2 px-4 py-2 bg-[rgba(0,255,136,0.1)] border border-[rgba(0,255,136,0.3)] rounded-full mb-4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="text-xs font-bold text-[var(--accent)] uppercase tracking-wider">Verified Credential</span>
+              </div>
+              <h3 class="font-display text-3xl font-bold mb-3">Clay Certified Expert</h3>
+              <p class="text-[var(--muted)] mb-8 leading-relaxed max-w-xl">
+                Proficient in building advanced Clay tables, data enrichment workflows, waterfall enrichment strategies, and seamless CRM integrations for scalable GTM operations.
+              </p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full max-w-md">
+                <div class="px-4 py-3 bg-[var(--bg)] rounded-xl border border-[var(--border)] text-center">
+                  <div class="text-xs text-[var(--muted)] mb-1">Skill</div>
+                  <div class="text-sm font-semibold">Data Enrichment</div>
+                </div>
+                <div class="px-4 py-3 bg-[var(--bg)] rounded-xl border border-[var(--border)] text-center">
+                  <div class="text-xs text-[var(--muted)] mb-1">Skill</div>
+                  <div class="text-sm font-semibold">Waterfall Logic</div>
+                </div>
+                <div class="px-4 py-3 bg-[var(--bg)] rounded-xl border border-[var(--border)] text-center">
+                  <div class="text-xs text-[var(--muted)] mb-1">Skill</div>
+                  <div class="text-sm font-semibold">CRM Sync</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="relative z-10 py-32 bg-[var(--bg-elevated)]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-20">
         <div class="space-y-8">
           <div>
-            <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">About Me</span>
-            <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">
-              Building digital<br>products with purpose
+            <span class="section-label reveal">About Me</span>
+            <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 leading-tight reveal reveal-delay-1">
+              Results-driven<br><span class="text-shimmer">GTM Engineer</span>
             </h2>
           </div>
-          
-          <div class="space-y-6 text-[var(--muted)] text-lg reveal reveal-delay-2">
+          <div class="space-y-6 text-lg text-[var(--muted)] reveal reveal-delay-2">
             <p>
-              I'm a multidisciplinary creative developer with 8+ years of experience crafting digital products 
-              that people actually want to use. My approach combines technical excellence with design thinking 
-              to create experiences that feel both intuitive and delightful.
+              I'm a GTM Engineer and Marketing Head with 2+ years leading outbound marketing and sales automation. I build scalable outbound campaigns, master CRM systems, and drive data-driven decisions.
             </p>
             <p>
-              When I'm not pushing pixels or writing code, you'll find me exploring hiking trails around 
-              the Bay Area, experimenting with generative art, or mentoring the next generation of designers 
-              through ADPList.
+              <span style="color: var(--fg);">Certified in Clay</span>, I specialize in data enrichment, workflow automation, and creating systems that generate consistent pipeline.
             </p>
           </div>
-
           <div class="flex flex-wrap gap-4 reveal reveal-delay-3">
-            <div class="flex items-center gap-3 px-4 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)]">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span class="text-sm font-medium">San Francisco, CA</span>
+            <div class="flex items-center gap-3 px-5 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)] hover:border-[var(--accent)] transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span class="font-medium">Remote / Worldwide</span>
             </div>
-            <div class="flex items-center gap-3 px-4 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)]">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
-              </svg>
-              <span class="text-sm font-medium">Open to freelance</span>
+            <div class="flex items-center gap-3 px-5 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)] hover:border-[var(--accent-secondary)] transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="font-medium">Freelance & Full-time</span>
             </div>
+            <a href="https://www.linkedin.com/in/tony-adijah-965903131/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-5 py-3 bg-[var(--card)] rounded-xl border border-[var(--border)] hover:border-[var(--accent-tertiary)] transition-colors group">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+              <span class="font-medium group-hover:text-[var(--accent-tertiary)] transition-colors">LinkedIn</span>
+            </a>
           </div>
         </div>
-
-        <!-- Experience Timeline -->
         <div class="space-y-8">
-          <h3 class="font-display font-bold text-xl reveal reveal-delay-1">Experience</h3>
-          
-          <div class="space-y-8">
-            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-2">
-              <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h4 class="font-display font-bold text-lg">Senior Creative Developer</h4>
-                  <p class="text-[var(--accent)]">Vercel</p>
+          <h3 class="font-display text-2xl font-bold reveal">Experience</h3>
+          <div class="space-y-0">
+            <div class="timeline-item reveal reveal-delay-1">
+              <div>
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                  <h4 class="font-display text-xl font-bold">GTM Engineer / Marketing Head</h4>
+                  <span class="text-sm text-[var(--muted)] whitespace-nowrap px-3 py-1 bg-[var(--card)] rounded-full">2023 — 2025</span>
                 </div>
-                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2022 — Present</span>
+                <p class="text-[var(--accent)] font-medium mt-1">Grow with Veena</p>
+                <ul class="text-sm text-[var(--muted)] mt-2 space-y-1 list-disc list-inside">
+                  <li>Built and executed GTM strategies for product launches.</li>
+                  <li>Automated outbound (email + LinkedIn) to scale lead generation.</li>
+                  <li>Improved lead quality by ~25% through targeting.</li>
+                  <li>Handled CRM, deliverability, and outreach infrastructure end-to-end.</li>
+                </ul>
               </div>
-              <p class="text-[var(--muted)] mt-3 text-sm">
-                Leading creative engineering initiatives and building interactive marketing experiences.
-              </p>
             </div>
-
-            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-3">
-              <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h4 class="font-display font-bold text-lg">Design Technologist</h4>
-                  <p class="text-[var(--accent)]">Figma</p>
+            <div class="timeline-item reveal reveal-delay-2">
+              <div>
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                  <h4 class="font-display text-xl font-bold">Territory Sales Manager</h4>
+                  <span class="text-sm text-[var(--muted)] whitespace-nowrap px-3 py-1 bg-[var(--card)] rounded-full">2019 — 2023</span>
                 </div>
-                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2019 — 2022</span>
+                <p class="text-[var(--accent-secondary)] font-medium mt-1">Metropolis Healthcare</p>
+                <ul class="text-sm text-[var(--muted)] mt-2 space-y-1 list-disc list-inside">
+                  <li>Owned territory growth and revenue targets.</li>
+                  <li>Opened new accounts and expanded key relationships.</li>
+                  <li>Handled on-ground sales, partnerships, and customer issues.</li>
+                  <li>Identified new market opportunities and demand pockets.</li>
+                </ul>
               </div>
-              <p class="text-[var(--muted)] mt-3 text-sm">
-                Prototyping future product concepts and building internal design tools.
-              </p>
-            </div>
-
-            <div class="timeline-item pl-8 pb-8 reveal reveal-delay-4">
-              <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h4 class="font-display font-bold text-lg">Frontend Developer</h4>
-                  <p class="text-[var(--accent)]">Stripe</p>
-                </div>
-                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2017 — 2019</span>
-              </div>
-              <p class="text-[var(--muted)] mt-3 text-sm">
-                Built and maintained payment interfaces used by millions of businesses.
-              </p>
-            </div>
-
-            <div class="timeline-item pl-8 reveal reveal-delay-4">
-              <div class="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h4 class="font-display font-bold text-lg">Junior Developer</h4>
-                  <p class="text-[var(--accent)]">IDEO</p>
-                </div>
-                <span class="text-sm text-[var(--muted)] whitespace-nowrap">2015 — 2017</span>
-              </div>
-              <p class="text-[var(--muted)] mt-3 text-sm">
-                Contributed to human-centered design projects across healthcare and education.
-              </p>
             </div>
           </div>
         </div>
@@ -731,121 +629,67 @@
     </div>
   </section>
 
-  <!-- Contact Section -->
-  <section id="contact" class="py-24 md:py-32 relative">
+  <!-- Contact -->
+  <section id="contact" class="relative z-10 py-32">
     <div class="max-w-7xl mx-auto px-6">
-      <div class="grid lg:grid-cols-2 gap-16">
-        
-        <!-- Contact Info -->
+      <div class="grid lg:grid-cols-2 gap-20">
         <div class="space-y-8">
           <div>
-            <span class="text-[var(--accent)] text-sm font-medium tracking-wider uppercase reveal">Get in Touch</span>
-            <h2 class="font-display font-800 text-4xl md:text-5xl mt-4 reveal reveal-delay-1">
-              Let's create<br>something together
+            <span class="section-label reveal">Contact</span>
+            <h2 class="font-display text-5xl md:text-6xl font-bold mt-6 leading-tight reveal reveal-delay-1">
+              Ready to<br><span class="text-shimmer">Scale?</span>
             </h2>
           </div>
-          
           <p class="text-lg text-[var(--muted)] max-w-md reveal reveal-delay-2">
-            Have a project in mind or just want to chat? I'm always open to discussing new opportunities, 
-            creative ideas, or ways to bring your vision to life.
+            Open to freelance, consulting, and full-time roles. Let's grow your sales engine.
           </p>
-
           <div class="space-y-4 reveal reveal-delay-3">
-            <a href="mailto:maya@example.com" class="flex items-center gap-4 group">
-              <div class="w-12 h-12 rounded-xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center group-hover:border-[var(--accent)] transition-colors">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
+            <a href="mailto:adijah95@gmail.com" class="flex items-center gap-4 group">
+              <div class="w-14 h-14 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center transition-all group-hover:border-[var(--accent)] group-hover:shadow-lg">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <div class="text-sm text-[var(--muted)]">Email me at</div>
+                <div class="font-medium text-lg group-hover:text-[var(--accent)] transition-colors">adijah95@gmail.com</div>
+              </div>
+            </a>
+            <a href="https://www.linkedin.com/in/tony-adijah-965903131/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 group">
+              <div class="w-14 h-14 rounded-2xl bg-[var(--card)] border border-[var(--border)] flex items-center justify-center transition-all group-hover:border-[var(--accent-tertiary)] group-hover:shadow-lg">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                  <rect x="2" y="9" width="4" height="12"/>
+                  <circle cx="4" cy="4" r="2"/>
                 </svg>
               </div>
               <div>
-                <div class="text-sm text-[var(--muted)]">Email</div>
-                <div class="font-medium group-hover:text-[var(--accent)] transition-colors">maya@example.com</div>
+                <div class="text-sm text-[var(--muted)]">Connect on</div>
+                <div class="font-medium text-lg group-hover:text-[var(--accent-tertiary)] transition-colors">LinkedIn</div>
               </div>
             </a>
           </div>
-
-          <!-- Social Links -->
-          <div class="flex gap-3 reveal reveal-delay-4">
-            <a href="#" class="social-link" aria-label="GitHub Profile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-              </svg>
-            </a>
-            <a href="#" class="social-link" aria-label="Twitter Profile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-            <a href="#" class="social-link" aria-label="LinkedIn Profile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </a>
-            <a href="#" class="social-link" aria-label="Dribbble Profile">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.816zm-11.62-2.58c.232-.4 3.045-5.055 8.332-6.765.135-.045.27-.084.405-.12-.26-.585-.54-1.167-.832-1.74C7.17 11.775 2.206 11.71 1.756 11.7l-.004.312c0 2.633.998 5.037 2.634 6.855zm-2.42-8.955c.46.008 4.683.026 9.477-1.248-1.698-3.018-3.53-5.558-3.8-5.928-2.868 1.35-5.01 3.99-5.676 7.17zM9.6 2.052c.282.38 2.145 2.914 3.822 6 3.645-1.365 5.19-3.44 5.373-3.702-1.81-1.61-4.19-2.586-6.795-2.586-.825 0-1.63.1-2.4.285zm10.335 3.483c-.218.29-1.935 2.493-5.724 4.04.24.49.47.985.68 1.486.08.18.15.36.22.53 3.41-.43 6.8.26 7.14.33-.02-2.42-.88-4.64-2.31-6.38z"/>
-              </svg>
-            </a>
-          </div>
         </div>
-
-        <!-- Contact Form -->
-        <form class="space-y-6 reveal reveal-delay-2" onsubmit="handleSubmit(event)">
+        <form class="space-y-6 reveal reveal-delay-2" id="contact-form">
           <div class="grid sm:grid-cols-2 gap-6">
             <div>
-              <label for="name" class="block text-sm font-medium mb-2">Name</label>
-              <input 
-                type="text" 
-                id="name" 
-                name="name"
-                class="input-field" 
-                placeholder="John Doe"
-                required
-              >
+              <label for="name" class="block text-sm font-medium mb-3">Name</label>
+              <input type="text" id="name" name="name" class="input-field" placeholder="Your Name" required>
             </div>
             <div>
-              <label for="email" class="block text-sm font-medium mb-2">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email"
-                class="input-field" 
-                placeholder="john@example.com"
-                required
-              >
+              <label for="email" class="block text-sm font-medium mb-3">Email</label>
+              <input type="email" id="email" name="email" class="input-field" placeholder="you@company.com" required>
             </div>
           </div>
-          
           <div>
-            <label for="subject" class="block text-sm font-medium mb-2">Subject</label>
-            <input 
-              type="text" 
-              id="subject" 
-              name="subject"
-              class="input-field" 
-              placeholder="Project inquiry"
-            >
+            <label for="subject" class="block text-sm font-medium mb-3">Subject</label>
+            <input type="text" id="subject" name="subject" class="input-field" placeholder="Project Inquiry">
           </div>
-          
           <div>
-            <label for="message" class="block text-sm font-medium mb-2">Message</label>
-            <textarea 
-              id="message" 
-              name="message"
-              rows="5" 
-              class="input-field resize-none" 
-              placeholder="Tell me about your project..."
-              required
-            ></textarea>
+            <label for="message" class="block text-sm font-medium mb-3">Message</label>
+            <textarea id="message" name="message" rows="5" class="input-field resize-none" placeholder="Tell me about your project..." required></textarea>
           </div>
-          
-          <button type="submit" class="btn-primary w-full justify-center">
-            Send Message
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
+          <button type="submit" class="btn-primary w-full justify-center magnetic-target">
+            Let's Talk Results
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </form>
       </div>
@@ -853,85 +697,217 @@
   </section>
 
   <!-- Footer -->
-  <footer class="py-8 border-t border-[var(--border)]">
+  <footer class="relative z-10 py-8 border-t border-[var(--border)]">
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2 text-[var(--muted)] text-sm">
           <span>Designed & Built by</span>
-          <span class="font-display font-bold text-[var(--fg)]">Maya Chen</span>
+          <span class="font-display font-bold text-[var(--fg)]">Tony Adijah</span>
         </div>
-        <div class="text-sm text-[var(--muted)]">
-          &copy; 2024 All rights reserved.
+        <div class="flex items-center gap-4">
+          <a href="https://www.linkedin.com/in/tony-adijah-965903131/" target="_blank" rel="noopener noreferrer" class="text-[var(--muted)] hover:text-[var(--accent)] transition-colors magnetic-target" aria-label="LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+          <span class="text-sm text-[var(--muted)]">&copy; 2024 All rights reserved.</span>
         </div>
       </div>
     </div>
   </footer>
 
   <script>
-    // Initialize after DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-      // Scroll reveal animation
-      const revealElements = document.querySelectorAll('.reveal');
-      
-      const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-      };
 
-      const revealObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            revealObserver.unobserve(entry.target);
-          }
+      // ===== CUSTOM CURSOR SYSTEM =====
+      var dot = document.getElementById('cursor-dot');
+      var ring = document.getElementById('cursor-ring');
+      var glow = document.getElementById('cursor-glow');
+      var trails = [];
+      for (var t = 1; t <= 5; t++) {
+        trails.push(document.getElementById('trail-' + t));
+      }
+
+      var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var cursorEnabled = !isTouchDevice && !prefersReducedMotion;
+
+      if (cursorEnabled && dot && ring && glow) {
+        var mouseX = 0, mouseY = 0;
+        var dotX = 0, dotY = 0;
+        var ringX = 0, ringY = 0;
+        var glowX = 0, glowY = 0;
+        var trailPositions = [];
+        var isMoving = false;
+        var moveTimeout;
+
+        for (var i = 0; i < trails.length; i++) {
+          trailPositions.push({ x: 0, y: 0 });
+        }
+
+        document.addEventListener('mousemove', function(e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          isMoving = true;
+          clearTimeout(moveTimeout);
+          moveTimeout = setTimeout(function() { isMoving = false; }, 100);
         });
+
+        document.addEventListener('click', function(e) {
+          createClickBurst(e.clientX, e.clientY);
+        });
+
+        function createClickBurst(x, y) {
+          for (var i = 0; i < 8; i++) {
+            var particle = document.createElement('div');
+            particle.style.cssText = 'position:fixed;width:4px;height:4px;border-radius:50%;pointer-events:none;z-index:99999;';
+            var colors = ['#00ff88', '#ff006e', '#00d4ff'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.boxShadow = '0 0 6px ' + particle.style.background;
+            document.body.appendChild(particle);
+            var angle = (Math.PI * 2 / 8) * i + (Math.random() * 0.5);
+            var velocity = 60 + Math.random() * 40;
+            var targetX = x + Math.cos(angle) * velocity;
+            var targetY = y + Math.sin(angle) * velocity;
+            animateParticle(particle, x, y, targetX, targetY);
+          }
+        }
+
+        function animateParticle(el, startX, startY, endX, endY) {
+          var startTime = Date.now();
+          var duration = 600;
+          function tick() {
+            var elapsed = Date.now() - startTime;
+            var progress = Math.min(elapsed / duration, 1);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            el.style.left = startX + (endX - startX) * eased + 'px';
+            el.style.top = startY + (endY - startY) * eased + 'px';
+            el.style.opacity = 1 - progress;
+            el.style.transform = 'scale(' + (1 - progress * 0.5) + ')';
+            if (progress < 1) { requestAnimationFrame(tick); } else { el.remove(); }
+          }
+          requestAnimationFrame(tick);
+        }
+
+        function animateCursor() {
+          dotX += (mouseX - dotX) * 0.35;
+          dotY += (mouseY - dotY) * 0.35;
+          dot.style.left = dotX + 'px';
+          dot.style.top = dotY + 'px';
+
+          ringX += (mouseX - ringX) * 0.15;
+          ringY += (mouseY - ringY) * 0.15;
+          ring.style.left = ringX + 'px';
+          ring.style.top = ringY + 'px';
+
+          glowX += (mouseX - glowX) * 0.08;
+          glowY += (mouseY - glowY) * 0.08;
+          glow.style.left = glowX + 'px';
+          glow.style.top = glowY + 'px';
+
+          for (var i = 0; i < trails.length; i++) {
+            var target = i === 0 ? { x: dotX, y: dotY } : trailPositions[i - 1];
+            var speed = 0.2 - (i * 0.03);
+            trailPositions[i].x += (target.x - trailPositions[i].x) * speed;
+            trailPositions[i].y += (target.y - trailPositions[i].y) * speed;
+            trails[i].style.left = trailPositions[i].x + 'px';
+            trails[i].style.top = trailPositions[i].y + 'px';
+            if (isMoving) {
+              var trailOpacity = 0.4 - (i * 0.07);
+              var trailSize = 5 - i;
+              trails[i].style.opacity = trailOpacity;
+              trails[i].style.width = trailSize + 'px';
+              trails[i].style.height = trailSize + 'px';
+              trails[i].style.background = i % 2 === 0 ? 'rgba(0, 255, 136, 0.6)' : 'rgba(0, 212, 255, 0.6)';
+              trails[i].style.boxShadow = '0 0 ' + (trailSize + 2) + 'px ' + trails[i].style.background;
+            } else {
+              trails[i].style.opacity = 0;
+            }
+          }
+
+          var dx = mouseX - ringX;
+          var dy = mouseY - ringY;
+          var speed = Math.sqrt(dx * dx + dy * dy);
+          var skewAmount = Math.min(speed * 0.3, 15);
+          var angle = Math.atan2(dy, dx) * (180 / Math.PI);
+          ring.style.transform = 'translate(-50%, -50%) rotate(' + angle + 'deg) scaleX(' + (1 + skewAmount * 0.01) + ')';
+
+          requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        var hoverTargets = document.querySelectorAll('a, button, .service-card, .case-card, .result-card, .cert-card, .social-icon, .tech-item, .btn-primary, .btn-secondary, .magnetic-target');
+        hoverTargets.forEach(function(el) {
+          el.addEventListener('mouseenter', function() { dot.classList.add('cursor-hover'); ring.classList.add('cursor-hover'); });
+          el.addEventListener('mouseleave', function() { dot.classList.remove('cursor-hover'); ring.classList.remove('cursor-hover'); });
+        });
+
+        var textTargets = document.querySelectorAll('input, textarea');
+        textTargets.forEach(function(el) {
+          el.addEventListener('mouseenter', function() { dot.classList.add('cursor-text'); ring.classList.add('cursor-text'); dot.classList.remove('cursor-hover'); ring.classList.remove('cursor-hover'); });
+          el.addEventListener('mouseleave', function() { dot.classList.remove('cursor-text'); ring.classList.remove('cursor-text'); });
+        });
+
+        var magneticElements = document.querySelectorAll('.magnetic-target');
+        magneticElements.forEach(function(el) {
+          el.addEventListener('mousemove', function(e) {
+            var rect = el.getBoundingClientRect();
+            var centerX = rect.left + rect.width / 2;
+            var centerY = rect.top + rect.height / 2;
+            var deltaX = (e.clientX - centerX) * 0.2;
+            var deltaY = (e.clientY - centerY) * 0.2;
+            el.style.transform = 'translate(' + deltaX + 'px, ' + deltaY + 'px)';
+          });
+          el.addEventListener('mouseleave', function() { el.style.transform = ''; });
+        });
+
+        document.addEventListener('mouseleave', function() { dot.classList.add('cursor-hidden'); ring.classList.add('cursor-hidden'); glow.style.opacity = '0'; });
+        document.addEventListener('mouseenter', function() { dot.classList.remove('cursor-hidden'); ring.classList.remove('cursor-hidden'); glow.style.opacity = '1'; });
+
+      } else {
+        if (dot) dot.style.display = 'none';
+        if (ring) ring.style.display = 'none';
+        if (glow) glow.style.display = 'none';
+        trails.forEach(function(t) { if (t) t.style.display = 'none'; });
+        document.querySelectorAll('*').forEach(function(el) { el.style.cursor = 'auto'; });
+      }
+
+      // ===== SCROLL REVEAL =====
+      var revealElements = document.querySelectorAll('.reveal');
+      var observerOptions = { root: null, rootMargin: '0px 0px -80px 0px', threshold: 0.1 };
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
       }, observerOptions);
+      revealElements.forEach(function(el) { revealObserver.observe(el); });
 
-      revealElements.forEach(function(el) {
-        revealObserver.observe(el);
-      });
-
-      // Smooth scroll for anchor links
+      // ===== SMOOTH SCROLL =====
       document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
         anchor.addEventListener('click', function(e) {
-          const targetId = this.getAttribute('href');
-          if (targetId === '#') return;
-          
-          const target = document.querySelector(targetId);
-          if (target) {
-            e.preventDefault();
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }
+          var targetId = this.getAttribute('href'); if (targetId === '#') return;
+          var target = document.querySelector(targetId);
+          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         });
       });
-    });
 
-    // Form submission handler
-    function handleSubmit(e) {
-      e.preventDefault();
-      const button = e.target.querySelector('button[type="submit"]');
-      const originalText = button.innerHTML;
-      
-      button.innerHTML = '<span>Sending...</span>';
-      button.disabled = true;
-      
-      // Simulate form submission
-      setTimeout(function() {
-        button.innerHTML = '<span>Message Sent!</span>';
-        button.style.background = '#22c55e';
-        
-        setTimeout(function() {
-          button.innerHTML = originalText;
-          button.style.background = '';
-          button.disabled = false;
-          e.target.reset();
-        }, 2000);
-      }, 1500);
-    }
+      // ===== CONTACT FORM =====
+      var form = document.getElementById('contact-form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var button = form.querySelector('button[type="submit"]');
+          var originalText = button.innerHTML;
+          button.innerHTML = 'Sending...'; button.disabled = true; button.style.opacity = '0.7';
+          setTimeout(function() {
+            button.innerHTML = 'Message Sent!'; button.style.background = '#00ff88'; button.style.boxShadow = '0 0 40px rgba(0, 255, 136, 0.5)';
+            setTimeout(function() { button.innerHTML = originalText; button.style.background = ''; button.style.boxShadow = ''; button.disabled = false; form.reset(); }, 2500);
+          }, 1500);
+        });
+      }
+    });
   </script>
 </body>
 </html>
