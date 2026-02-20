@@ -291,13 +291,18 @@
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(5, 5, 5, 0.98);
       -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px);
-      z-index: 55; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem;
-      display: flex; opacity: 0; visibility: hidden;
+      z-index: 55;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0; visibility: hidden;
       -webkit-transform: scale(0.95); transform: scale(0.95);
       -webkit-transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s, -webkit-transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .mobile-menu.active { opacity: 1; visibility: visible; -webkit-transform: scale(1); transform: scale(1); }
+
     .mobile-menu a {
       font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 600;
       color: var(--muted); text-decoration: none; padding: 0.75rem 2rem;
@@ -447,7 +452,6 @@
       z-index: 1; pointer-events: none;
     }
 
-    /* Desktop hover */
     @media (hover: hover) {
       .case-study-card:hover {
         -webkit-transform: translateY(-10px) scale(1.01); transform: translateY(-10px) scale(1.01);
@@ -459,7 +463,6 @@
       .case-study-card:hover .card-number { color: var(--accent-secondary) !important; text-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
     }
 
-    /* Touch/iOS active states — THIS FIXES THE NUMBER COLOR */
     @media (hover: none) {
       .case-study-card:active {
         -webkit-transform: scale(0.98); transform: scale(0.98);
@@ -470,7 +473,6 @@
       .case-study-card:active .card-number { color: var(--accent-secondary) !important; text-shadow: 0 0 30px rgba(255, 0, 110, 0.5); }
     }
 
-    /* JS-driven touch active class for iOS */
     .case-study-card.touch-active {
       -webkit-transform: scale(0.98); transform: scale(0.98);
       border-color: rgba(255, 0, 110, 0.4);
@@ -607,16 +609,16 @@
   </div>
   <div class="grid-pattern" aria-hidden="true"></div>
 
-  <!-- Mobile Menu -->
+  <!-- Mobile Menu (FIXED ALIGNMENT) -->
   <div class="mobile-menu" id="mobile-menu">
-    <div class="mobile-menu-nav">
-      <a href="index.html" class="home-link">⌂ Home</a>
-      <a href="index.html#services">Services</a>
-      <a href="index.html#results">Results</a>
-      <a href="index.html#case-studies">Case Studies</a>
-      <a href="index.html#certification">Certification</a>
-      <a href="index.html#about">About</a>
-      <a href="index.html#contact">Contact</a>
+    <div class="flex flex-col items-center justify-center w-full px-6 gap-2">
+      <a href="index.html" class="home-link text-center w-full max-w-xs">⌂ Home</a>
+      <a href="index.html#services" class="text-center w-full max-w-xs">Services</a>
+      <a href="index.html#results" class="text-center w-full max-w-xs">Results</a>
+      <a href="index.html#case-studies" class="text-center w-full max-w-xs">Case Studies</a>
+      <a href="index.html#certification" class="text-center w-full max-w-xs">Certification</a>
+      <a href="index.html#about" class="text-center w-full max-w-xs">About</a>
+      <a href="index.html#contact" class="text-center w-full max-w-xs">Contact</a>
     </div>
   </div>
 
@@ -1098,7 +1100,6 @@
       // ===== TOUCH EFFECTS (iOS/Android) =====
       if (isTouchDevice) {
 
-        // Touch ripple for containers
         function createRipple(element, e) {
           var rect = element.getBoundingClientRect();
           var touch = e.touches ? e.touches[0] : e;
@@ -1139,18 +1140,13 @@
           }, { passive: true });
         });
 
-        // ===== CASE STUDY CARD TOUCH — FIX FOR iOS NUMBER COLOR =====
         document.querySelectorAll('.case-study-card').forEach(function(card) {
           card.addEventListener('touchstart', function(e) {
-            // Add touch-active class for iOS
             card.classList.add('touch-active');
-
-            // Also create ripple
             createRipple(card, e);
           }, { passive: true });
 
           card.addEventListener('touchend', function() {
-            // Small delay so user can see the color change
             setTimeout(function() {
               card.classList.remove('touch-active');
             }, 200);
@@ -1245,7 +1241,7 @@
         document.addEventListener('mouseenter',function(){dot.classList.remove('cursor-hidden');ring.classList.remove('cursor-hidden');glow.style.opacity='1';});
       }
 
-      // ===== SCROLL REVEAL (Safari-compatible) =====
+      // ===== SCROLL REVEAL =====
       var reveals = document.querySelectorAll('.reveal');
       if ('IntersectionObserver' in window) {
         var obs = new IntersectionObserver(function(entries) {
@@ -1255,11 +1251,10 @@
         }, { root: null, rootMargin: '0px 0px -50px 0px', threshold: 0.05 });
         reveals.forEach(function(el) { obs.observe(el); });
       } else {
-        // Fallback for very old Safari
         reveals.forEach(function(el) { el.classList.add('visible'); });
       }
 
-      // ===== SMOOTH SCROLL (Safari fallback) =====
+      // ===== SMOOTH SCROLL =====
       document.querySelectorAll('a[href^="#"]').forEach(function(a) {
         a.addEventListener('click', function(e) {
           var id = this.getAttribute('href');
