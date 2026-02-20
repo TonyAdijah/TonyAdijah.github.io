@@ -1,6 +1,6 @@
 /* ============================================
    TONY ADIJAH — PORTFOLIO JS
-   v5.0 — Bulletproof animations
+   v6.0 — Smooth staggered reveal animations
    ============================================ */
 
 (function () {
@@ -12,21 +12,19 @@
   var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
   /* ===== INIT ===== */
-  // Try to run ASAP
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(startApp, 0);
   } else {
     document.addEventListener('DOMContentLoaded', startApp);
   }
 
-  // Also run on window load as backup
   window.addEventListener('load', function () {
-    revealVisible();
+    // Delay initial reveal for smoother experience
+    setTimeout(revealVisible, 250);
   });
 
   function startApp() {
-    // Debug: confirm script is running
-    console.log('✅ Portfolio script loaded successfully');
+    console.log('✅ Portfolio script loaded');
 
     initMobileMenu();
     initRevealAnimations();
@@ -67,20 +65,19 @@
 
   /* ===== REVEAL ANIMATIONS ===== */
   function initRevealAnimations() {
-    // ★ STEP 1: Immediately reveal elements in viewport
-    revealVisible();
+    // ★ Initial delay — let page settle before first animations
+    setTimeout(function() {
+      revealVisible();
+    }, 350);
 
-    // ★ STEP 2: Set up observer for below-fold elements
+    // ★ Set up IntersectionObserver for scroll reveals
     setupObserver();
 
-    // ★ STEP 3: Multiple timed checks (catches edge cases)
-    setTimeout(revealVisible, 50);
-    setTimeout(revealVisible, 200);
-    setTimeout(revealVisible, 500);
-    setTimeout(revealVisible, 1000);
-    setTimeout(revealVisible, 2000);
+    // ★ Backup checks (catches edge cases)
+    setTimeout(revealVisible, 700);
+    setTimeout(revealVisible, 1400);
 
-    // ★ STEP 4: Check on scroll
+    // ★ Scroll handler with debounce
     var ticking = false;
     window.addEventListener('scroll', function () {
       if (!ticking) {
@@ -92,9 +89,9 @@
       }
     }, { passive: true });
 
-    // ★ STEP 5: Check on resize
+    // ★ Resize handler
     window.addEventListener('resize', function () {
-      setTimeout(revealVisible, 100);
+      setTimeout(revealVisible, 150);
     }, { passive: true });
 
     console.log('✅ Reveal animations ready');
@@ -108,14 +105,19 @@
       var observer = new IntersectionObserver(function (entries) {
         for (var i = 0; i < entries.length; i++) {
           if (entries[i].isIntersecting) {
-            entries[i].target.classList.add('visible');
+            // Small delay before adding visible class for smoother feel
+            (function(el) {
+              setTimeout(function() {
+                el.classList.add('visible');
+              }, 80);
+            })(entries[i].target);
             observer.unobserve(entries[i].target);
           }
         }
       }, {
         root: null,
-        rootMargin: '200px 0px 0px 0px',
-        threshold: 0
+        rootMargin: '50px 0px 0px 0px',
+        threshold: 0.1
       });
 
       for (var i = 0; i < elements.length; i++) {
@@ -127,7 +129,7 @@
     }
   }
 
-  // ★ Core: reveal elements currently in viewport
+  // Reveal elements currently in viewport
   function revealVisible() {
     var elements = document.querySelectorAll('.reveal:not(.visible)');
     if (!elements.length) return;
@@ -136,8 +138,7 @@
 
     for (var i = 0; i < elements.length; i++) {
       var rect = elements[i].getBoundingClientRect();
-
-      if (rect.top < vh + 150 && rect.bottom > -150) {
+      if (rect.top < vh + 50 && rect.bottom > -50) {
         elements[i].classList.add('visible');
       }
     }
@@ -168,10 +169,13 @@
         var targetY = target.getBoundingClientRect().top + window.pageYOffset - 80;
 
         if (isIOS || !('scrollBehavior' in document.documentElement.style)) {
-          smoothScrollTo(targetY, 600);
+          smoothScrollTo(targetY, 700);
         } else {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+
+        // Trigger reveal after scroll
+        setTimeout(revealVisible, 350);
       });
     }
   }
@@ -184,7 +188,8 @@
     function step(timestamp) {
       if (!startTime) startTime = timestamp;
       var progress = Math.min((timestamp - startTime) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
+      // Smooth easing curve
+      var eased = 1 - Math.pow(1 - progress, 4);
       window.scrollTo(0, startY + diff * eased);
       if (progress < 1) requestAnimationFrame(step);
     }
@@ -355,7 +360,7 @@
       });
     }
 
-    // Magnetic
+    // Magnetic effect
     var mEls = document.querySelectorAll('.magnetic-target');
     for (var m = 0; m < mEls.length; m++) {
       mEls[m].addEventListener('mousemove', function (e) {
@@ -368,7 +373,7 @@
       });
     }
 
-    // Hide/show
+    // Hide/show cursor
     document.addEventListener('mouseleave', function () {
       dot.classList.add('cursor-hidden'); ring.classList.add('cursor-hidden');
       glow.style.opacity = '0';
